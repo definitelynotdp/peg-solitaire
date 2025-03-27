@@ -6,7 +6,7 @@ using UnityEngine;
 /// ScriptableObject that holds data for different board layouts.
 /// </summary>
 [CreateAssetMenu]
-public class BoardDataBase : ScriptableObject 
+public class BoardLayoutDataBase : ScriptableObject 
 {
     [SerializeField] private Board[] board;
 
@@ -18,7 +18,13 @@ public class BoardDataBase : ScriptableObject
     /// <summary>
     /// Retrieves the board at the specified index.
     /// </summary>
-    /// <param name="index">Index of the board to retrieve.</param>
+    /// <param name="index">Index of the board to retrieve.
+    /// 0 - French
+    /// 1 - German
+    /// 2 - Asymmetrical
+    /// 3- English
+    /// 4 - Diamond
+    /// 5- Triangular</param>
     /// <returns>The board at the specified index.</returns>
     public Board GetBoard(int index) 
         => board[index];
@@ -57,7 +63,7 @@ public class BoardDataBase : ScriptableObject
                 boardLayout.Add("      P P P      ");
                 break;
             
-            case 2: // Asymetrical
+            case 2: // Asymmetrical
                 boardLayout.Add("8 8 0");
                 boardLayout.Add("    P P P      ");
                 boardLayout.Add("    P P P      ");

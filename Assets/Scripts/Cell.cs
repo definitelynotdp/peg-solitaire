@@ -5,6 +5,16 @@ using UnityEngine;
 /// </summary>
 public class Cell : MonoBehaviour 
 {
+    [SerializeField] private Material selectedMaterial;
+    [SerializeField] private Material predictedMaterial;
+    [SerializeField] private Material pegMaterial;
+    [SerializeField] private Material emptyMaterial;
+    private Cell _up, _down, _left, _right;
+    private Vector2Int _cellPosition; 
+    private Renderer _renderer;
+    private CellValue _cellValue;
+    private bool _isHighlightOn;
+    
     /// <summary>
     /// Enum representing possible cell states.
     /// </summary>
@@ -16,15 +26,7 @@ public class Cell : MonoBehaviour
         Predicted
     };
     
-    [SerializeField] private Material selectedMaterial;
-    [SerializeField] private Material predictedMaterial;
-    [SerializeField] private Material pegMaterial;
-    [SerializeField] private Material emptyMaterial;
-    private Vector2Int _cellPosition; 
-    private Renderer _renderer;
-    private CellValue _cellValue;
-    bool _isHighlightOn;
-
+    
     // Start is called before the first frame update
     private void Awake() 
     {
@@ -36,7 +38,7 @@ public class Cell : MonoBehaviour
     /// </summary>
     /// <param name="pos">Position of the cell in the grid.</param>
     /// <param name="value">Initial value of the cell.</param>
-    public void Init(Vector2Int pos, CellValue value) 
+    public void Initialize(Vector2Int pos, CellValue value) 
     {
         name = pos.ToString();
         _cellPosition = pos;
@@ -84,7 +86,7 @@ public class Cell : MonoBehaviour
     /// </summary>
     /// <returns>The current cell value.</returns>
     public CellValue GetValue() 
-        => _cellValue;
+            => _cellValue;
 
     /// <summary>
     /// Highlights the cell when the mouse enters, if the cell contains a Peg.
@@ -108,5 +110,26 @@ public class Cell : MonoBehaviour
             _renderer.material = pegMaterial;
             _isHighlightOn = false;
         }
+    }
+    
+    public Cell GetNeighbor(Movement.Direction direction, int distance = 1) 
+    {
+        return direction switch
+        {
+            Movement.Direction.Up => (distance == 1) ? _up : _up?._up,
+            Movement.Direction.Down => (distance == 1) ? _down : _down?._down,
+            Movement.Direction.Left => (distance == 1) ? _left : _left?._left,
+            Movement.Direction.Right => (distance == 1) ? _right : _right?._right,
+            _ => null
+        };
+    }
+
+    public Cell GetAdjacentJumpCell(Cell end) 
+    {
+        if (end == _up?._up) return _up;
+        if (end == _down?._down) return _down;
+        if (end == _left?._left) return _left;
+        if (end == _right?._right) return _right;
+        return null;
     }
 }

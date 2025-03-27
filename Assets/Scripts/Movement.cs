@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class Movement 
 {
-    private readonly Dictionary<Vector2Int, Cell> _board; // game board for checking validty of movement
+    private readonly Dictionary<Vector2Int, Cell> _board; // game board for checking validity of movement
     private (int, int) _dimension; // board dimension (number of rows and columns)
     private Cell _start; // start position of movement
-    private Cell _jump; // jump position of movement (between start and end)
+    private Cell _jump; // jump to position of movement (between start and end)
     private Cell _end; // end position of movement
 
     public enum Direction
@@ -27,15 +27,17 @@ public class Movement
         }
         catch (System.ArgumentException e) 
         {
-            System.Console.WriteLine($"Invalid arguments: {e}");
+        #if UNITY_EDITOR
+            Debug.Log($"Invalid arguments: {e}");
+        #endif
         }
     }
 
     public Movement(Dictionary<Vector2Int, Cell> board, Cell start) : this(board, start, null) {}
 
-    public Movement(Dictionary<Vector2Int, Cell> board) : this(board, null, null) {}
+    /*public Movement(Dictionary<Vector2Int, Cell> board) : this(board, null, null) {}
     
-    public Movement() : this(null, null, null) {}
+    public Movement() : this(null, null, null) {}*/
 
     public Cell GetStart() => _start;
     
@@ -140,7 +142,9 @@ public class Movement
         }
         catch (System.ArgumentException) 
         {
+            #if UNITY_EDITOR
             Debug.Log($"Invalid direction: {direction}");
+            #endif
         }
     }
 
@@ -158,10 +162,11 @@ public class Movement
 
     public bool IsValidMovement() 
     {
-        // jump cell becomes null when start and end positions don't indicate a valid movement
         SetJump();
-        return  (_start.GetValue() == Cell.CellValue.Peg || _start.GetValue() == Cell.CellValue.Selected) && 
-                (_jump != null && _jump.GetValue() == Cell.CellValue.Peg) &&
-                (_end.GetValue() == Cell.CellValue.Selected || _end.GetValue() == Cell.CellValue.Empty || _end.GetValue() == Cell.CellValue.Predicted);
+        return _start is not null && _jump is not null && _end is not null &&
+               (_start.GetValue() == Cell.CellValue.Peg || _start.GetValue() == Cell.CellValue.Selected) &&
+               _jump.GetValue() == Cell.CellValue.Peg &&
+               (_end.GetValue() == Cell.CellValue.Selected || _end.GetValue() == Cell.CellValue.Empty || _end.GetValue() == Cell.CellValue.Predicted);
     }
+
 }

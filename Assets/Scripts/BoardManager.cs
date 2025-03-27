@@ -2,10 +2,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.Serialization;
 
 public class BoardManager : MonoBehaviour 
 {
-    [SerializeField] private BoardDataBase boardDB;
+    [FormerlySerializedAs("boardDB")] [SerializeField] private BoardLayoutDataBase boardLayoutDB;
     [SerializeField] private TextMeshProUGUI boardNameText;
     [SerializeField] private TextMeshProUGUI maxGameScore;
     [SerializeField] private Image boardImage;
@@ -26,7 +27,7 @@ public class BoardManager : MonoBehaviour
     /// </summary>
     public void NextOption() 
     {
-        _selectedBoardOption = (_selectedBoardOption + 1 < boardDB.BoardCount) ? _selectedBoardOption + 1 : 0; 
+        _selectedBoardOption = (_selectedBoardOption + 1 < boardLayoutDB.BoardCount) ? _selectedBoardOption + 1 : 0; 
         UpdateBoard();
         Save();
     }
@@ -36,7 +37,7 @@ public class BoardManager : MonoBehaviour
     /// </summary>
     public void BackOption() 
     {
-        _selectedBoardOption = (_selectedBoardOption - 1 >= 0) ? _selectedBoardOption - 1 : boardDB.BoardCount - 1; 
+        _selectedBoardOption = (_selectedBoardOption - 1 >= 0) ? _selectedBoardOption - 1 : boardLayoutDB.BoardCount - 1; 
         UpdateBoard();
         Save();
     }
@@ -47,12 +48,13 @@ public class BoardManager : MonoBehaviour
     private void UpdateBoard() 
     {
         
-        Board board = boardDB.GetBoard(_selectedBoardOption);
+        Board board = boardLayoutDB.GetBoard(_selectedBoardOption);
         boardImage.sprite = board.boardSprite;
         boardNameText.text = board.boardName;
 
         
-        if (PlayerPrefs.HasKey("_" + _selectedBoardOption + "BoardScore")) {
+        if (PlayerPrefs.HasKey("_" + _selectedBoardOption + "BoardScore")) 
+        {
             int maxScore = PlayerPrefs.GetInt("_" + _selectedBoardOption + "BoardScore");
             maxGameScore.text = "Best: " + maxScore;
         }

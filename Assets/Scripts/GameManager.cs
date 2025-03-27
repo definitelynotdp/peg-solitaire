@@ -12,13 +12,14 @@ using UnityEngine.Serialization;
 /// </summary>
 public class GameManager : MonoBehaviour 
 {
+    ///<summary>
     /// Defines the different board types available in the game.
     /// </summary>
     private enum BoardType
     {
         French,
         German,
-        Asymetrical,
+        Asymmetrical,
         English,
         Diamond,
         Triangular
@@ -33,7 +34,7 @@ public class GameManager : MonoBehaviour
         Computer
     }
 
-    [SerializeField] private BoardDataBase boardDB;
+    [FormerlySerializedAs("boardDB")] [SerializeField] private BoardLayoutDataBase boardLayoutDB;
     [SerializeField] private Image gameOverPanel;
     [SerializeField] private GameObject gameRulesPanel;
     [SerializeField] private Cell cellPrefab; 
@@ -50,7 +51,7 @@ public class GameManager : MonoBehaviour
     private GameMode _gameMode;
     private BoardType _gameBoardType; 
     private int _boardWidth; 
-    private int _baordHeight;
+    private int _boardHeight;
     private Dictionary<Vector2Int, Cell> _cells;
     private Stack<Movement> _allMovements;
     private List<Cell> _possibleEndCells;
@@ -74,7 +75,7 @@ public class GameManager : MonoBehaviour
     void Start() 
     {
         LoadGame();
-        mainCamera.transform.position = new Vector3((float) _boardWidth / 2 - 0.5f, (float) _baordHeight / 2 , -10);
+        mainCamera.transform.position = new Vector3((float) _boardWidth / 2 - 0.5f, (float) _boardHeight / 2 , -10);
         undoButton.gameObject.SetActive(false);
         
         // AI Gaming
@@ -223,12 +224,12 @@ public class GameManager : MonoBehaviour
     public void MakeRandomMove() 
     {
         int x = Random.Range(0, _boardWidth);
-        int y = Random.Range(0, _baordHeight);
+        int y = Random.Range(0, _boardHeight);
         
         List<Cell> endPos = null; 
         for (int i = 0; i < _boardWidth && endPos == null; i++) 
         {
-            for (int j = 0; ++j < _baordHeight && endPos == null; j++) 
+            for (int j = 0; ++j < _boardHeight && endPos == null; j++) 
             {
                 if (_cells.TryGetValue(new Vector2Int(x, y), out Cell start)) {
                     endPos = GetPossibleEndPos(start);
@@ -239,7 +240,7 @@ public class GameManager : MonoBehaviour
                         StartCoroutine(AutoMove(start, end));
                     }
                 }
-                y = (y + 1 < _baordHeight) ? y + 1 : 0; 
+                y = (y + 1 < _boardHeight) ? y + 1 : 0; 
             }
             x = (x + 1 < _boardWidth) ? x + 1 : 0; 
         }
@@ -273,7 +274,8 @@ public class GameManager : MonoBehaviour
     private List<Cell> GetPossibleEndPos(Cell start) 
     {
         List<Cell> endPosition = new List<Cell>();
-        if (start is not null && (start.GetValue() == Cell.CellValue.Peg || start.GetValue() == Cell.CellValue.Selected)) {
+        if (start is not null && (start.GetValue() == Cell.CellValue.Peg || start.GetValue() == Cell.CellValue.Selected)) 
+        {
             Movement mov = new Movement(_cells, start);
             for (int dir = 0; dir < 4; dir++) 
             {
@@ -302,7 +304,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void LoadGame()
     {
-        List<string> lines = boardDB.GetBoardLayout((int) _gameBoardType);
+        List<string> lines = boardLayoutDB.GetBoardLayout((int) _gameBoardType);
         
         if (lines.Count > 0) 
         {
@@ -311,7 +313,7 @@ public class GameManager : MonoBehaviour
                 throw new System.ArgumentException();
 
             _boardWidth = int.Parse(values[0]);
-            _baordHeight = int.Parse(values[1]);
+            _boardHeight = int.Parse(values[1]);
             _numberOfMoves = int.Parse(values[2]);
             _numberOfPegs = 0;
 
@@ -319,7 +321,7 @@ public class GameManager : MonoBehaviour
             
             for (int y = lines.Count - 1; y > 0; y--) 
             {
-                pos.y = _baordHeight - y;
+                pos.y = _boardHeight - y;
                 for (int x = 0; x <= lines[y].Length / 2; x++) 
                 {
                     pos.x = x;
@@ -380,7 +382,7 @@ public class GameManager : MonoBehaviour
     private void InstantiateCell(Vector2Int pos, Cell.CellValue val) 
     {
         Cell cell = Instantiate(cellPrefab, new Vector3(pos.x, pos.y, 0), Quaternion.identity);
-        cell.Init(pos, val);
+        cell.Initialize(pos, val);
         _cells.Add(pos, cell);
     }
 }
